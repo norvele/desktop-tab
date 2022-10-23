@@ -1,0 +1,11 @@
+@mixin delayedShowOnHover($targetSelector) {
+  #{$targetSelector} {
+    transition: opacity 0.1s;
+    opacity: 0;
+  }
+
+  &:hover #{$targetSelector} {
+    opacity: 1;
+    transition-delay: 0.4s;
+  }
+}
