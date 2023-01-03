@@ -1,26 +1,41 @@
 <script setup lang="ts">
-defineProps<{
-  modelValue: number;
+import type { Ref } from "vue";
+import { onMounted, ref } from "vue";
+import { getControlEmits, useControl } from "@/composition/useControl";
+
+type Value = number;
+
+const props = defineProps<{
+  modelValue: Value;
   placeholder?: string;
+  autofocus?: boolean;
 }>();
 
-const emit = defineEmits({
-  "update:model-value": (value: number) => true,
-});
+const emit = defineEmits(getControlEmits<Value>());
 
-const onInput = (event: Event) => {
-  const value = parseInt((event.target as HTMLInputElement)?.value || "0");
-  emit("update:model-value", value);
-};
+const getValueFromEvent = (event: Event) =>
+  parseInt((event.target as HTMLInputElement)?.value || "0");
+
+const { onInput, onChange } = useControl<Value>({ emit, getValueFromEvent });
+
+const inputRef = ref() as Ref<HTMLInputElement>;
+
+onMounted(() => {
+  if (props.autofocus) {
+    inputRef.value.focus();
+  }
+});
 </script>
 
 <template>
   <input
+    ref="inputRef"
     class="ui-text-input"
     type="text"
     :value="modelValue"
     :placeholder="placeholder"
     @input="onInput"
+    @change="onChange"
   />
 </template>
 

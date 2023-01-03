@@ -1,6 +1,9 @@
 <script setup lang="ts">
 defineProps<{
   color?: "primary" | "secondary";
+  type?: "button" | "submit";
+  form?: string;
+  isDisabled?: boolean;
 }>();
 
 const emit = defineEmits({
@@ -15,8 +18,9 @@ const onClick = () => {
 <template>
   <button
     class="ui-button"
-    :class="[`_color-${color}`]"
-    type="button"
+    :class="[`_color-${color}`, { '_is-disabled': isDisabled }]"
+    :type="type ?? 'button'"
+    :form="form"
     @click="onClick"
   >
     <slot />
@@ -43,13 +47,18 @@ const onClick = () => {
   }
 
   &._color-primary {
-    background-color: #1a73e8;
+    background-color: #3a8ef9;
     color: #fff;
     box-shadow: 0 0 2px rgba(#1a73e8, 0.12), 0 2px 2px rgba(#1a73e8, 0.24);
 
     &:hover {
-      background-color: #1a73e8e6;
+      background-color: #4d96f3;
     }
+  }
+
+  &._is-disabled {
+    opacity: 0.5;
+    pointer-events: none;
   }
 }
 </style>

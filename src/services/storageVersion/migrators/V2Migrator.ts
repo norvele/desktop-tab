@@ -8,7 +8,7 @@ type TilesMap = StorageConfigDataByVersion<"v2">["tiles"];
 type Coordinates = StorageConfigDataByVersion<"v2">["tilePlaces"];
 
 export class V2Migrator implements IMigrator<"v1", "v2"> {
-  migrate(
+  public migrate(
     data: StorageConfigDataByVersion<"v1">
   ): StorageConfigDataByVersion<"v2"> {
     const tilesMatrix = data.tileLists.map((tileList) => tileList.tiles);
@@ -20,9 +20,16 @@ export class V2Migrator implements IMigrator<"v1", "v2"> {
         columns: tiles.length,
         rows: 1,
       },
+      screenIds: ["default"],
+      screens: {
+        default: {
+          id: "default",
+          label: "Default",
+        },
+      },
       tilePlaces: tiles.reduce((acc, tile, index) => {
         acc[tile.id] = {
-          screenId: "",
+          screenId: "default",
           x: index,
           y: 0,
         };
@@ -35,6 +42,7 @@ export class V2Migrator implements IMigrator<"v1", "v2"> {
       style: {
         ...data.style,
         backgroundBlur: 0,
+        tileStyle: "circle",
       },
     };
   }

@@ -1,23 +1,16 @@
 <script setup lang="ts">
-import { useStyleStore } from "@/stores/useStyleStore";
 import AppBackground from "@/components/AppBackground.vue";
-import { useModal } from "@/composition/useModal";
 import { computed } from "vue";
+import { getStyleService } from "@/composition/injectors";
 
-const styleStore = useStyleStore();
-const styleModal = useModal("style");
+const styleService = getStyleService();
 
-const backgroundOverlay = computed(() => {
-  if (styleModal.isOpen.value) {
-    return styleStore.editingStyle.backgroundOverlay;
-  }
-  return styleStore.style.backgroundOverlay;
-});
+const style = computed(() => styleService.getStyle());
 </script>
 
 <template>
   <app-background
-    :background-overlay="backgroundOverlay"
-    :background-url="styleStore.style.backgroundUrl"
+    :background="style.background"
+    :overlay="style.overlay"
   ></app-background>
 </template>

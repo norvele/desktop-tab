@@ -1,28 +1,30 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { getControlEmits, useControl } from "@/composition/useControl";
+
+type Value = number;
 
 const props = defineProps<{
-  modelValue: number;
+  modelValue: Value;
   min: number;
   max: number;
-  hasCenter: boolean;
+  hasCenter?: boolean;
 }>();
 
-const emit = defineEmits({
-  "update:model-value": (value: number) => true,
-});
+const emit = defineEmits(getControlEmits<Value>());
+
+const getValueFromEvent = (event: Event) => {
+  const nValue = Number((event.target as HTMLInputElement)?.value) || 0;
+  const percentage = nValue / 100;
+  return percentage * (props.max - props.min) + props.min;
+};
+
+const { onInput, onChange } = useControl<Value>({ emit, getValueFromEvent });
 
 const normalizedValue = computed(() => {
   const percentage = (props.modelValue - props.min) / (props.max - props.min);
   return percentage * 100;
 });
-
-const onInput = (event: Event) => {
-  const nValue = Number((event.target as HTMLInputElement)?.value) || 0;
-  const percentage = nValue / 100;
-  const value = percentage * (props.max - props.min) + props.min;
-  emit("update:model-value", value);
-};
 </script>
 
 <template>
@@ -35,6 +37,7 @@ const onInput = (event: Event) => {
       :max="100"
       :step="1"
       @input="onInput"
+      @change="onChange"
     />
   </div>
 </template>
@@ -69,11 +72,11 @@ const onInput = (event: Event) => {
 
     &::-webkit-slider-thumb {
       box-shadow: 0 0 0 #000000;
-      border: 0 solid #2497e3;
+      border: 0 solid #3a8ef9;
       height: 14px;
       width: 14px;
       border-radius: 8px;
-      background: #1a73e8;
+      background: #3a8ef9;
       cursor: pointer;
       -webkit-appearance: none;
       margin-top: -6px;

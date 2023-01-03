@@ -1,20 +1,35 @@
-import { createApp, markRaw } from "vue";
+import "reflect-metadata";
+import { createApp } from "vue";
 import App from "@/App.vue";
 import { createPinia } from "pinia";
-import { containerKey, createContainer } from "@/container";
-import { useConfigStore } from "@/stores/useConfigStore";
+import { createContainer, provideContainer } from "@/container";
+import type { StorageService } from "@/services/StorageService";
+import type { ScreenService } from "@/services/ScreenService";
+import { ServiceType } from "@/serviceTypes";
+import type { AppService } from "@/services/AppService";
 
 const isProduction = import.meta.env.PROD;
 
 async function start() {
-  const container = createContainer(isProduction);
-  const pinia = createPinia().use(({ store }) => {
-    store.container = markRaw(container);
-  });
-  createApp(App).use(pinia).provide(containerKey, container).mount("#app");
-  await useConfigStore().init();
+  const pinia = createPinia();
 
-  // @ts-ignore
-  window.container = container;
+  const container = createContainer(isProduction);
+  provideContainer(container);
+
+  createApp(App).use(pinia).mount("#app");
+
+  const storageService = container.get<StorageService>(
+    ServiceType.StorageService
+  );
+  await storageService.init({
+    windowWidth: window.innerWidth,
+    windowHeight: window.innerHeight,
+  });
+
+  const appService = container.get<AppService>(ServiceType.AppService);
+  await appService.init();
+
+  const screenService = container.get<ScreenService>(ServiceType.ScreenService);
+  await screenService.init();
 }
 start();

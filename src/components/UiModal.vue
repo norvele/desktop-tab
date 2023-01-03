@@ -22,12 +22,20 @@ const clickListener = (event: MouseEvent) => {
   }
 };
 
+const handleEscape = (event: KeyboardEvent) => {
+  if (event.key === "Escape") {
+    close();
+  }
+};
+
 onMounted(() => {
   document.addEventListener("click", clickListener);
+  document.addEventListener("keydown", handleEscape);
 });
 
 onBeforeUnmount(() => {
   document.removeEventListener("click", clickListener);
+  document.removeEventListener("keydown", handleEscape);
 });
 </script>
 
@@ -57,15 +65,23 @@ onBeforeUnmount(() => {
   z-index: 100;
   display: flex;
   align-items: center;
-  justify-content: center;
+  overflow: auto;
+  flex-direction: column;
+  padding: 8px 0;
+  box-sizing: border-box;
 
   &__backdrop {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.6);
+  }
+
+  &__container {
+    margin-top: auto;
+    margin-bottom: auto;
   }
 }
 
@@ -78,8 +94,8 @@ onBeforeUnmount(() => {
 
   &__close {
     position: absolute;
-    top: 12px;
-    right: 12px;
+    top: 8px;
+    right: 8px;
   }
 
   &__title {

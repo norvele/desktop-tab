@@ -1,19 +1,53 @@
 import type { Ref } from "vue";
-import type { VueComponent } from "@/types";
+import type { TilePlace } from "@/types";
 import type { TileDragDataTransfer } from "@/types";
-import { useGridStore } from "@/stores/useGridStore";
-import { onBeforeUnmount, onMounted } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import type { TilePlaces } from "@/types";
+import {
+  getGridService,
+  getScreenService,
+  getTileService,
+} from "@/composition/injectors";
 
-export function useTileDragging(
-  gridRef: Ref<HTMLElement>,
-  tileRefs: Ref<VueComponent[]>
-) {
+export function useTileDragging(gridRef: Ref<HTMLElement>) {
   const dragGhostRootClass = "drag-ghost-root";
   const dragContainerClass = "drag-ghost-container";
   const dragSelectedTileClass = "drag-ghost-selected-tile";
-  const gridStore = useGridStore();
+  const gridService = getGridService();
+  const tileService = getTileService();
+  const screenService = getScreenService();
+
+  const draggingDataTransfer = ref<TileDragDataTransfer>();
+  const isDragging = ref(false);
+  const dragHoveredCells = ref<Record<string, true>>({});
+  const currentScreenId = computed(() => screenService.getCurrentScreenId());
+  const tilePlaces = computed(() => gridService.getTilePlaces());
+  const selectedTileIds = computed(() => gridService.getSelectedTileIds());
+
+  const getTilePlacesFromDragDataTransfer = (
+    newPlace: TilePlace,
+    dataTransfer: TileDragDataTransfer
+  ): TilePlaces => {
+    const data = {
+      [dataTransfer.mainTileId]: newPlace,
+    } as TilePlaces;
+    Object.entries(dataTransfer.otherTilesMap).reduce(
+      (acc, [tileId, relativeCoords]) => {
+        acc[tileId] = {
+          screenId: newPlace.screenId,
+          x: newPlace.x + relativeCoords.x,
+          y: newPlace.y + relativeCoords.y,
+        };
+        return acc;
+      },
+      data
+    );
+    return data;
+  };
 
   const getSelectionDragGhostElement = () => {
+    const gridBounding = gridRef.value.getBoundingClientRect();
+    // const gridComputedStyle = getComputedStyle(gridRef.value);
     const element = document.querySelector(`.${dragGhostRootClass}`);
     if (element) {
       return element;
@@ -24,10 +58,10 @@ export function useTileDragging(
       `<style>
       .${dragGhostRootClass} {
         position: absolute;
-        width: 100%;
-        height: 100%;
-        bottom: 0;
-        left: 0;
+        width: ${gridBounding.width}px;
+        height: ${gridBounding.height}px;
+        top: ${gridBounding.top}px;
+        left: ${gridBounding.left}px;
         z-index: -2;
       }
       .${dragGhostRootClass} .${dragContainerClass} {
@@ -44,23 +78,16 @@ export function useTileDragging(
     return selectionDragGhost;
   };
 
-  const onClickTile = (tileId: string, event: MouseEvent) => {
-    if (!event.shiftKey) {
-      return;
-    }
-    event.preventDefault();
-    gridStore.toggleTileSelection(tileId);
-  };
-
   const onDrag = (mainTileId: string) => {
     return (event: DragEvent) => {
+      isDragging.value = true;
       // DATA
-      const mainTilePlace = gridStore.tilePlaces[mainTileId];
-      const otherTilesMap = gridStore.selectedTileIds.reduce((acc, tileId) => {
+      const mainTilePlace = tilePlaces.value[mainTileId];
+      const otherTilesMap = selectedTileIds.value.reduce((acc, tileId) => {
         if (tileId === mainTileId) {
           return acc;
         }
-        const tilePlace = gridStore.tilePlaces[tileId];
+        const tilePlace = tilePlaces.value[tileId];
         return {
           ...acc,
           [tileId]: {
@@ -70,10 +97,12 @@ export function useTileDragging(
         };
       }, {} as TileDragDataTransfer["otherTilesMap"]);
       const dataTransfer: TileDragDataTransfer = {
+        dataTransferType: "tile",
         mainTileId,
         otherTilesMap,
       };
       event.dataTransfer?.setData("text", JSON.stringify(dataTransfer));
+      draggingDataTransfer.value = dataTransfer;
 
       // GHOST
       const gridBounding = gridRef.value.getBoundingClientRect();
@@ -87,60 +116,84 @@ export function useTileDragging(
           deltaY
         );
       }
-    };
-  };
-
-  const onDragOver = (x: number, y: number) => {
-    return (event: DragEvent) => {
-      // TODO
-      // Проверить что не пересекаемся с тайлами которые не в селекте
-      // Проверить что не вылазим за границы
-      event.preventDefault();
-    };
-  };
-
-  const onDrop = (x: number, y: number) => {
-    return (event: DragEvent) => {
-      event.preventDefault();
-      const rawData = event.dataTransfer?.getData("text");
-      if (!rawData) {
-        throw new Error("No data");
+      if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = "move";
       }
-      const data = JSON.parse(rawData) as TileDragDataTransfer;
-      gridStore.updateTilePlacesByDragData(
-        {
-          x,
-          y,
-          screenId: gridStore.currentScreenId,
-        },
-        data
-      );
     };
   };
 
-  const handleClick = (event: MouseEvent) => {
-    for (const ref of tileRefs.value) {
-      if (ref?.$el.contains(event.target as Node)) {
-        return;
-      }
+  const onDragOver = (event: DragEvent) => {
+    event.preventDefault();
+  };
+
+  const onDrop = (event: DragEvent, x: number, y: number) => {
+    event.preventDefault();
+    isDragging.value = false;
+    draggingDataTransfer.value = undefined;
+    dragHoveredCells.value = {};
+    const data = getDragDataTransfer(event);
+    if (!data) {
+      return;
     }
-    gridStore.deselectAllTiles();
+    const newTilePlaces = getTilePlacesFromDragDataTransfer(
+      { x, y, screenId: currentScreenId.value },
+      data
+    );
+    tileService.moveTilesSafely(newTilePlaces).catch(() => {
+      // nothing
+    });
+  };
+
+  const onDragEnter = (x: number, y: number) => {
+    if (!draggingDataTransfer.value) {
+      return;
+    }
+    dragHoveredCells.value = {};
+    dragHoveredCells.value[`${x}:${y}`] = true;
+    const otherPlaces = getTilePlacesFromDragDataTransfer(
+      { x, y, screenId: currentScreenId.value },
+      draggingDataTransfer.value
+    );
+    Object.values(otherPlaces).forEach(
+      (place) => (dragHoveredCells.value[`${place.x}:${place.y}`] = true)
+    );
+  };
+  const onDragEnd = () => {
+    dragHoveredCells.value = {};
+  };
+  const isDragHoveredCell = (x: number, y: number) => {
+    return dragHoveredCells.value[`${x}:${y}`] || false;
   };
 
   onMounted(() => {
-    document.addEventListener("click", handleClick);
+    document.addEventListener("dragend", onDragEnd);
   });
 
   onBeforeUnmount(() => {
-    document.removeEventListener("click", handleClick);
+    document.removeEventListener("dragend", onDragEnd);
   });
 
   return {
     dragContainerClass,
     dragSelectedTileClass,
-    onClickTile,
+    isDragging,
     onDrag,
     onDragOver,
     onDrop,
+    onDragEnter,
+    isDragHoveredCell,
   };
+}
+
+export function getDragDataTransfer(event: DragEvent) {
+  const rawData = event.dataTransfer?.getData("text");
+  if (!rawData) {
+    return undefined;
+  }
+  try {
+    const data = JSON.parse(rawData) as TileDragDataTransfer;
+    return data.dataTransferType === "tile" ? data : undefined;
+  } catch (e) {
+    return undefined;
+  }
 }

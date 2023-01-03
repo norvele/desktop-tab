@@ -1,18 +1,24 @@
 <script setup lang="ts">
-defineProps<{
-  label?: string;
-  error?: string;
-}>();
+withDefaults(
+  defineProps<{
+    tag?: string;
+    label?: string;
+    error?: string;
+  }>(),
+  {
+    tag: "label",
+  }
+);
 </script>
 
 <template>
-  <label class="ui-field">
+  <component :is="tag" class="ui-field">
     <div v-if="label" class="ui-field__label">{{ label }}</div>
     <div class="ui-field__input">
       <slot />
     </div>
     <div v-if="error" class="ui-field__error">{{ error }}</div>
-  </label>
+  </component>
 </template>
 
 <style lang="scss" scoped>
@@ -34,7 +40,7 @@ defineProps<{
 
   &:focus-within {
     .ui-field__label {
-      color: #1a73e8;
+      color: #3a8ef9;
     }
   }
 }

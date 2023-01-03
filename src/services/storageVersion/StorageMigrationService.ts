@@ -7,13 +7,16 @@ import type {
 } from "@/services/storageVersion/types";
 import { storageVersions } from "@/services/storageVersion/types";
 import type { OmitFirstReadonlyArrayElement } from "@/types";
+import { injectable } from "inversify";
 import { V1Migrator } from "@/services/storageVersion/migrators/V1Migrator";
 import { V2Migrator } from "@/services/storageVersion/migrators/V2Migrator";
+import { V3Migrator } from "@/services/storageVersion/migrators/V3Migrator";
 
 type VersionWithoutFirst = OmitFirstReadonlyArrayElement<
   typeof storageVersions
 >[number];
 
+@injectable()
 export class StorageMigrationService {
   // TODO: create migratorsManager
   protected migratorsMap: {
@@ -21,13 +24,14 @@ export class StorageMigrationService {
   } = {
     v1: new V1Migrator(),
     v2: new V2Migrator(),
+    v3: new V3Migrator(),
   };
 
   public getCurrentVersion(): CurrentStorageVersion {
     return storageVersions[storageVersions.length - 1] as CurrentStorageVersion;
   }
 
-  migrate(
+  public migrate(
     data: AbstractStorageConfigData<StorageVersion>
   ): CurrentStorageConfigData {
     const version = data.version || "v0";

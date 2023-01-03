@@ -1,17 +1,19 @@
-import { StorageClientServiceInterface } from "@/types";
+import type { StorageClientServiceInterface } from "@/types";
+import { injectable } from "inversify";
 
+@injectable()
 export class ChromeExtensionStorageClient
   implements StorageClientServiceInterface
 {
-  async get<T>(key: string): Promise<T | null> {
+  public async get<T>(key: string): Promise<T | null> {
     return (await chrome.storage.sync.get(key))[key] || null;
   }
 
-  async set<T>(key: string, value: T): Promise<void> {
+  public async set<T>(key: string, value: T): Promise<void> {
     await chrome.storage.sync.set({ [key]: value });
   }
 
-  async remove(key: string): Promise<void> {
+  public async remove(key: string): Promise<void> {
     await chrome.storage.sync.remove(key);
   }
 }

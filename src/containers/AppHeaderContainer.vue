@@ -1,74 +1,51 @@
 <script setup lang="ts">
 import AppHeader from "@/components/AppHeader.vue";
-import { useStyleStore } from "@/stores/useStyleStore";
-import { useModal } from "@/composition/useModal";
-import { useTileStore } from "@/stores/useTileStore";
-import { useGridStore } from "@/stores/useGridStore";
+import { openTileModal, openMultipleTilesAddModal } from "@/composition/tile";
+import {
+  getAppService,
+  getGridService,
+  getScreenService,
+} from "@/composition/injectors";
+import { openScreenModal } from "@/composition/screen";
+import { computed } from "vue";
+import { getDropdownItemsFromOpenedTabs } from "@/composition/useOpenedTabs";
 
-const styleStore = useStyleStore();
-const tileStore = useTileStore();
-const gridStore = useGridStore();
+const screenService = getScreenService();
+const gridService = getGridService();
+const appService = getAppService();
 
-const styleModal = useModal("style");
-const openStyleModal = () => {
-  styleStore.editingStyle = { ...styleStore.style };
-  styleModal.openModal(
-    {
-      ...styleStore.style,
-      gridColumns: gridStore.grid.columns,
-      gridRows: gridStore.grid.rows,
-    },
-    {
-      save: async ({
-        backgroundBlur,
-        backgroundOverlay,
-        backgroundUrl,
-        gridColumns,
-        gridRows,
-      }) => {
-        await styleStore.updateStyle({
-          backgroundBlur,
-          backgroundOverlay,
-          backgroundUrl,
-        });
-        await gridStore.updateGridParams({
-          columns: gridColumns,
-          rows: gridRows,
-        });
-        styleModal.closeModal();
-      },
-      input: ({ backgroundBlur, backgroundOverlay, backgroundUrl }) => {
-        styleStore.editingStyle = {
-          backgroundBlur,
-          backgroundOverlay,
-          backgroundUrl,
-        };
-      },
-    }
+const tabItems = computed(() => {
+  return getDropdownItemsFromOpenedTabs(screenService.getCurrentScreenId());
+});
+
+const hasFreePlaces = computed(() => {
+  return !!gridService.getFreeScreenPlacesNumber(
+    screenService.getCurrentScreenId()
   );
+});
+
+const onAddTile = () => {
+  openTileModal(screenService.getCurrentScreenId());
 };
 
-const tileModal = useModal("tile");
-const openTileModal = () => {
-  tileModal.openModal(
-    {
-      title: "Add Tile",
-      label: "",
-      url: "",
-    },
-    {
-      save(payload) {
-        tileStore.addTile(gridStore.currentScreenId, payload);
-        tileModal.closeModal();
-      },
-      delete() {},
-    }
-  );
+const onAddTileMultiple = () => {
+  openMultipleTilesAddModal(screenService.getCurrentScreenId());
+};
+
+const openSettings = () => {
+  appService.setSettingsOpen(true);
 };
 </script>
 
 <template>
-  <app-header @click-add="openTileModal" @click-settings="openStyleModal">
+  <app-header
+    :has-free-places="hasFreePlaces"
+    :tab-items="tabItems"
+    @click-add-tile="onAddTile"
+    @click-add-tile-multiple="onAddTileMultiple"
+    @click-add-screen="openScreenModal"
+    @click-settings="openSettings"
+  >
     <slot />
   </app-header>
 </template>

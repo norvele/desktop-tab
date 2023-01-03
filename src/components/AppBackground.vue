@@ -1,36 +1,42 @@
 <script setup lang="ts">
+import type { AppStyle } from "@/types/configRelated/v3/styleTypes";
+import AppBackgroundUrl from "@/components/AppBackgroundUrl.vue";
 import { computed } from "vue";
+import AppBackgroundRandomGradient from "@/components/AppBackgroundRandomGradient.vue";
 
 const props = defineProps<{
-  backgroundUrl: string;
-  backgroundOverlay: number;
+  background: AppStyle["background"];
+  overlay: AppStyle["overlay"];
 }>();
 
-const overlayColor = computed(() => {
-  if (props.backgroundOverlay < 0.5) {
-    return "dark";
+const backgroundComponent = computed(() => {
+  switch (props.background.type) {
+    case "url":
+      return AppBackgroundUrl;
+    case "randomGradient":
+      return AppBackgroundRandomGradient;
+    default:
+      throw new Error("Unknown background type");
   }
-  return "light";
-});
-
-const overlayOpacity = computed(() => {
-  return Math.abs(props.backgroundOverlay - 0.5) * 2;
 });
 </script>
 
 <template>
-  <div
-    class="app-background"
-    :style="{
-      backgroundImage: props.backgroundUrl
-        ? `url('${props.backgroundUrl}')`
-        : undefined,
-    }"
-  >
+  <div class="app-background">
+    <component
+      class="app-background__back"
+      :is="backgroundComponent"
+      :background="background"
+      :style="{
+        '--background-blur': overlay.blur * 30 + 'px',
+      }"
+    ></component>
     <div
-      class="app-background__overlay overlay"
-      :class="[`_color-${overlayColor}`]"
-      :style="{ opacity: overlayOpacity }"
+      class="app-background__overlay"
+      :style="{
+        opacity: overlay.opacity,
+        backgroundColor: overlay.color,
+      }"
     ></div>
   </div>
 </template>
@@ -38,8 +44,15 @@ const overlayOpacity = computed(() => {
 <style lang="scss" scoped>
 .app-background {
   position: relative;
-  background-size: cover;
-  background-position: center;
+
+  &__back {
+    filter: blur(var(--background-blur));
+    position: absolute;
+    top: calc(var(--background-blur) * -2);
+    left: calc(var(--background-blur) * -2);
+    width: calc(100% + var(--background-blur) * 4);
+    height: calc(100% + var(--background-blur) * 4);
+  }
 
   &__overlay {
     position: absolute;
@@ -47,15 +60,6 @@ const overlayOpacity = computed(() => {
     left: 0;
     width: 100%;
     height: 100%;
-  }
-}
-
-.overlay {
-  &._color-dark {
-    background-color: #000;
-  }
-  &._color-light {
-    background-color: #fff;
   }
 }
 </style>

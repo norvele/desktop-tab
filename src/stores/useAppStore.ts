@@ -1,9 +1,0 @@
-import { defineStore } from "pinia";
-
-export const useAppStore = defineStore("appStore", {
-  state: () => ({}),
-  getters: {},
-  actions: {
-    async init() {},
-  },
-});

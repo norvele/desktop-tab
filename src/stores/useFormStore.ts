@@ -1,4 +1,4 @@
-import { defineStore, getActivePinia } from "pinia";
+import { defineStore } from "pinia";
 import type { ComputedRef, Ref, UnwrapRef } from "vue";
 import { computed, ref } from "vue";
 import type { Validator } from "@/utils/validation";
@@ -64,7 +64,14 @@ function createForm<FC extends AbstractFieldConfigs>(fieldConfigs: FC) {
     });
   });
 
-  const setValues = (data: FormData<FC>) => {
+  const setValue = <K extends keyof FC>(
+    fieldId: K,
+    value: UnwrapRef<FC[K]["ref"]>
+  ) => {
+    fieldConfigs[fieldId].ref.value = value;
+  };
+
+  const setValues = (data: Partial<FormData<FC>>) => {
     Object.entries(data).forEach(([key, value]) => {
       fieldConfigs[key].ref.value = value;
     });
@@ -78,6 +85,8 @@ function createForm<FC extends AbstractFieldConfigs>(fieldConfigs: FC) {
     fields,
     formData,
     hasError,
+    isErrorsVisible,
+    setValue,
     setValues,
     setErrorsVisible,
   };

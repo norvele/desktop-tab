@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from "vue";
 
-const root = ref<HTMLElement>();
+const triggerRef = ref<HTMLElement>();
+const bodyRef = ref<HTMLElement>();
 const isOpened = ref(false);
 
 const close = () => {
@@ -11,7 +12,10 @@ const toggle = () => {
   isOpened.value = !isOpened.value;
 };
 const clickListener = (event: Event) => {
-  if (!root.value?.contains(event.target as HTMLElement)) {
+  if (
+    !triggerRef.value?.contains(event.target as HTMLElement) &&
+    !bodyRef.value?.contains(event.target as HTMLElement)
+  ) {
     close();
   }
 };
@@ -26,26 +30,27 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="ui-dropdown" ref="root">
-    <div class="ui-dropdown__trigger" @click="toggle">
+  <div class="ui-dropdown">
+    <div class="ui-dropdown__trigger" ref="triggerRef" @click="toggle">
       <slot name="trigger" />
     </div>
-    <div v-if="isOpened" class="ui-dropdown__body">
-      <slot name="body" />
+    <div v-if="isOpened" ref="bodyRef" class="ui-dropdown__body">
+      <slot name="body" :close="close" />
     </div>
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .ui-dropdown {
   position: relative;
-}
 
-.ui-dropdown__body {
-  position: absolute;
-  background-color: #fff;
-  border: 1px solid #000;
-  transform: translateY(-1px);
-  padding: 10px;
+  &__trigger {
+    display: inline-block;
+  }
+
+  &__body {
+    z-index: 100;
+    position: absolute;
+  }
 }
 </style>

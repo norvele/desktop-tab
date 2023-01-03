@@ -25,8 +25,8 @@ defineProps<{
   justify-content: center;
   cursor: pointer;
   color: #fff;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
 
   & > :deep(*) {

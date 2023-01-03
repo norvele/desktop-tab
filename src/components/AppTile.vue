@@ -1,124 +1,86 @@
 <script setup lang="ts">
 import type { Icon } from "@/types";
-import IconKebab from "@/components/icons/IconKebab.vue";
-import UiIconButton from "@/components/UiIconButton.vue";
+import AppTileIcon from "@/components/AppTileIcon.vue";
+import type { TileStyleUnion } from "@/types/configRelated/v3/styleTypes";
 
 defineProps<{
   label: string;
   url: string;
   icon: Icon;
   isSelected?: boolean;
-}>();
-
-defineEmits<{
-  (e: "click-more"): void;
+  isAboutToSelect?: boolean;
+  style?: TileStyleUnion;
 }>();
 </script>
 
 <template>
-  <a :href="url" class="app-tile" :class="{ '_is-selected': isSelected }">
-    <div class="tile">
-      <div class="tile__icon tile-icon">
-        <slot name="icon">
-          <img
-            v-if="icon.src"
-            class="tile-icon__img"
-            :src="icon.src"
-            draggable="false"
-            alt=""
-          />
-          <div class="tile-icon__stub" :style="{ backgroundColor: icon.color }">
-            {{ icon.symbol }}
-          </div>
-        </slot>
-      </div>
-      <div class="tile__label">{{ label }}</div>
-    </div>
-    <ui-icon-button
-      class="app-tile__action"
-      @click.stop.prevent="$emit('click-more')"
-    >
-      <icon-kebab />
-    </ui-icon-button>
+  <a
+    :href="url"
+    class="app-tile"
+    :class="{
+      '_is-selected': isSelected,
+      '_is-about-to-select': isAboutToSelect,
+    }"
+  >
+    <app-tile-icon
+      class="app-tile__icon"
+      :src="icon.src"
+      :symbol="icon.symbol"
+      :color="icon.color"
+      :style="style"
+    />
+    <div class="app-tile__label" :title="label">{{ label }}</div>
   </a>
 </template>
 
 <style lang="scss" scoped>
 @import "@/styles/delayedShowOnHover.scss";
+@import "@/styles/iosRound.scss";
 
 .app-tile {
-  @include delayedShowOnHover(".app-tile__action");
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   box-sizing: border-box;
   position: relative;
   border-radius: 4px;
   cursor: pointer;
   text-decoration: none;
   color: #000;
-  padding: 16px 32px;
-
-  &__action {
-    margin: 4px 2px;
-    position: absolute;
-    top: 0;
-    right: 0;
-  }
-
-  &:hover {
-    background-color: rgba(#fff, 0.2);
-  }
-
-  &._is-selected {
-    border: 1px solid #fff;
-    background-color: rgba(#000, 0.2);
-  }
-}
-
-.tile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  padding: 8px;
   user-select: none;
+  border: 2px solid transparent;
 
   &__icon {
+    flex-shrink: 1;
+    flex-grow: 1;
     margin-bottom: 8px;
+    aspect-ratio: 1 / 1;
+    min-height: 0;
   }
 
   &__label {
+    flex-shrink: 0;
+    flex-grow: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     text-align: center;
-    padding: 0 8px;
     box-sizing: border-box;
     width: 100%;
     font-size: 13px;
     text-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
     color: #fff;
   }
-}
 
-.tile-icon {
-  width: 48px;
-  height: 48px;
-  background-color: #f1f3f4;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &__img {
-    width: 24px;
-    height: 24px;
+  &:hover {
+    background-color: rgba(#fff, 0.2);
   }
 
-  &__stub {
-    width: 24px;
-    height: 24px;
-    color: #fff;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  &._is-selected,
+  &._is-about-to-select {
+    border-color: #d5d5d5;
+    background-color: rgba(#000, 0.2);
   }
 }
 </style>

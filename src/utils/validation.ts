@@ -1,22 +1,24 @@
+import type { FormGroup } from "@/services/form/FormGroup";
+
 export type Error = string;
 export type ValidateFunction<V> = (value: V) => Error | Error[] | undefined;
 
 export class Validator<V> {
   public name = "";
   public stopped = false;
-  readonly validateCallback;
+  protected readonly validateCallback: ValidateFunction<V>;
 
   constructor(name: string, validateCallback: ValidateFunction<V>) {
     this.validateCallback = validateCallback;
     this.name = name;
   }
 
-  stop(): Validator<V> {
+  public stop(): Validator<V> {
     this.stopped = true;
     return this;
   }
 
-  validate(value: V): Error | Error[] | undefined {
+  public validate(value: V): Error | Error[] | undefined {
     return this.validateCallback(value);
   }
 }
@@ -62,6 +64,9 @@ export function createLengthValidator({
   minChars?: number;
 }): Validator<string> {
   return new Validator("Length", (value) => {
+    if (!value) {
+      return;
+    }
     if (value.length > maxChars) {
       return `Must be under ${maxChars} characters`;
     }
@@ -80,6 +85,22 @@ export function createUrlValidator(): Validator<string> {
       new URL(value);
     } catch (e) {
       return "Must be a valid URL";
+    }
+  });
+}
+
+export function createGroupEveryValidValidator(
+  errorMessage = `Every field must be valid`
+): Validator<FormGroup> {
+  return new Validator("Group", (group) => {
+    if (!group) {
+      return;
+    }
+    const hasError = Object.values(group.getChildren()).some(
+      (child) => child.getErrors().length
+    );
+    if (hasError) {
+      return errorMessage;
     }
   });
 }

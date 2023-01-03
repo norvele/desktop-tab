@@ -4,7 +4,7 @@ import type {
 } from "@/services/storageVersion/types";
 
 export class V1Migrator implements IMigrator<"v0", "v1"> {
-  migrate(
+  public migrate(
     data: StorageConfigDataByVersion<"v0">
   ): StorageConfigDataByVersion<"v1"> {
     return {
