@@ -14,6 +14,7 @@ import {
   getTileService,
 } from "@/composition/injectors";
 import { computed } from "vue";
+import { copyToClipboard } from "@/composition/copyToClipboard";
 
 export const openTileModal = (
   screenId: string,
@@ -131,6 +132,16 @@ export const openTileContextMenu = (
   ];
 
   const items: DropdownMenuItems = [openItems];
+  if (!isMultiSelect.value) {
+    items.push([
+      {
+        label: "Copy Link address",
+        onClick: () => {
+          copyToClipboard(tile.url);
+        },
+      },
+    ]);
+  }
   if (editItems.length) {
     items.push(editItems);
   }
