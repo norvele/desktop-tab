@@ -28,6 +28,9 @@ const selectableTileClassName = ref("selectable-tile");
 const rows = computed(() => gridService.getGridParams().rows);
 const columns = computed(() => gridService.getGridParams().columns);
 const currentScreenId = computed(() => screenService.getCurrentScreenId());
+const onBackgroundTextColor = computed(() =>
+  styleService.getOnBackgroundTextColor()
+);
 
 const grid = computed(() => {
   const grid = [];
@@ -106,6 +109,7 @@ const isTileSelected = (tileId: string) => {
     :selectable-class-name="selectableTileClassName"
     selectable-id-attr-name="data-tile-id"
     :selected-ids="selectedTileIds"
+    :color="onBackgroundTextColor"
     class="app-grid-wrapper"
     @about-to-select="updateAboutToSelectTileIds"
     @select="updateSelectedTileIds"
@@ -157,6 +161,7 @@ const isTileSelected = (tileId: string) => {
             :style="tileStyle"
             :is-selected="isTileSelected(tile.id)"
             :is-about-to-select="isAboutToSelect(tile.id)"
+            :text-color="onBackgroundTextColor"
             :draggable="true"
             :ondragstart="onDrag(tile.id)"
           />

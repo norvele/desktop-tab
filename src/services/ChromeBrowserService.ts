@@ -73,6 +73,16 @@ export class ChromeBrowserService implements BrowserService {
     });
   }
 
+  public getTheme(): "light" | "dark" {
+    if (
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+    ) {
+      return "dark";
+    }
+    return "light";
+  }
+
   protected async fetchOpenedTabs() {
     const tabs = await chrome.tabs.query({});
     this.openedTabsMap = tabs

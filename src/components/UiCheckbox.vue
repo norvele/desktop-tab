@@ -3,6 +3,7 @@ import IconCheck from "@/components/icons/IconCheck.vue";
 import { computed } from "vue";
 import IconMinus from "@/components/icons/IconMinus.vue";
 import { getControlEmits, useControl } from "@/composition/useControl";
+import { useTheme } from "@/composition/useTheme";
 
 type Value = string | boolean | null;
 
@@ -17,6 +18,8 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(getControlEmits<Value>());
+
+const { colors } = useTheme();
 
 const getValueFromEvent = (event: Event) => {
   const raw = (event.target as HTMLInputElement)?.checked || false;
@@ -76,6 +79,7 @@ const changeHandler = (event: Event) => {
   cursor: pointer;
   flex-wrap: nowrap;
   max-width: 100%;
+  color: v-bind("colors.onBaseBackContrast");
 
   &__box {
     flex-shrink: 0;
@@ -100,11 +104,11 @@ const changeHandler = (event: Event) => {
   width: 20px;
   height: 20px;
   border-radius: 4px;
-  background: #f1f3f4;
+  background: v-bind("colors.inputBack");
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #dfe1e2;
+  border: 1px solid v-bind("colors.onBaseBackBorder");
 
   &__input {
     display: none;
@@ -116,9 +120,9 @@ const changeHandler = (event: Event) => {
   }
 
   &._is-active {
-    background: #3a8ef9;
-    border-color: #3a8ef9;
-    color: #fff;
+    background: v-bind("colors.primaryBack");
+    border-color: v-bind("colors.primaryBack");
+    color: v-bind("colors.onPrimaryBack");
   }
 }
 </style>

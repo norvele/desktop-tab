@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import { isEmoji } from "@/utils/isEmoji";
 import type { TileStyleUnion } from "@/types/configRelated/v3/styleTypes";
+import { useTheme } from "@/composition/useTheme";
 
 const props = defineProps<{
   src: string;
@@ -9,6 +10,8 @@ const props = defineProps<{
   color: string;
   style?: TileStyleUnion;
 }>();
+
+const { colors } = useTheme();
 
 const isEmojiSymbol = computed(() => {
   return isEmoji(props.symbol);
@@ -28,7 +31,24 @@ const isEmojiSymbol = computed(() => {
       alt=""
     />
     <div v-else class="app-tile-icon__stub" :style="{ backgroundColor: color }">
-      {{ symbol }}
+      <svg
+        width="100%"
+        height="100%"
+        viewBox="0 0 32 32"
+        preserveAspectRatio="xMinYMid meet"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <text
+          x="50%"
+          y="50%"
+          dominant-baseline="central"
+          text-anchor="middle"
+          :font-size="isEmojiSymbol ? 32 : 16"
+          fill="white"
+        >
+          {{ symbol }}
+        </text>
+      </svg>
     </div>
   </div>
 </template>
@@ -37,11 +57,11 @@ const isEmojiSymbol = computed(() => {
 @import "@/styles/iosRound.scss";
 
 .app-tile-icon {
-  background-color: #f1f3f4;
+  background-color: v-bind("colors.tileBack");
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 4px solid #f1f3f4;
+  border: 4px solid v-bind("colors.tileBack");
   border-radius: 4px;
   overflow: hidden;
 
@@ -57,6 +77,20 @@ const isEmojiSymbol = computed(() => {
     border-radius: 999px;
 
     .app-tile-icon__stub {
+      border-radius: 999px;
+    }
+  }
+
+  &._style-only-icon {
+    border-color: transparent;
+    background-color: transparent;
+
+    .app-tile-icon__img {
+      max-width: 100%;
+    }
+
+    .app-tile-icon__stub {
+      max-width: 100%;
       border-radius: 999px;
     }
   }

@@ -5,6 +5,7 @@ defineProps<{
   label: string;
   isNonInteractive: boolean;
   isActive: boolean;
+  textColor: "light" | "dark";
 }>();
 
 const emit = defineEmits<{
@@ -34,10 +35,13 @@ onBeforeUnmount(() => {
 <template>
   <div
     class="app-screen-label"
-    :class="{
-      '_is-interactive': !isNonInteractive,
-      '_is-active': isActive,
-    }"
+    :class="[
+      {
+        '_is-interactive': !isNonInteractive,
+        '_is-active': isActive,
+      },
+      `_text-color-${textColor}`,
+    ]"
     :ondragenter="onDragEnter"
     :ondragleave="onDragLeave"
   >
@@ -66,6 +70,20 @@ onBeforeUnmount(() => {
 
       .app-screen-label__action {
         opacity: 1;
+      }
+    }
+  }
+
+  &._text-color-dark {
+    color: #000;
+
+    &._is-active {
+      background-color: rgba(#000, 0.1);
+    }
+
+    &._is-interactive {
+      &:hover {
+        background-color: rgba(#000, 0.1);
       }
     }
   }

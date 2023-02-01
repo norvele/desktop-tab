@@ -10,6 +10,10 @@ const props = defineProps<{
   background: BackgroundRandomGradientPart;
 }>();
 
+const emit = defineEmits<{
+  (event: "change"): void;
+}>();
+
 const currentDate = ref(new Date());
 useInterval(() => {
   currentDate.value = new Date();
@@ -57,6 +61,9 @@ watch(gradient, (value) => {
     tag: gradientRefresher.value.tag === "div" ? "span" : "div",
     gradient: value,
   };
+  setTimeout(() => {
+    emit("change");
+  }, 300); // Wait for the transition to finish
 });
 </script>
 
@@ -83,7 +90,7 @@ watch(gradient, (value) => {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s ease;
+  transition: opacity 0.3s ease;
 }
 
 .fade-enter-from,

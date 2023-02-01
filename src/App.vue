@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import AppModalsContainer from "@/containers/AppModalsContainer.vue";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, watch } from "vue";
 import "vue3-emoji-picker/css";
 import AppBackgroundContainer from "@/containers/AppBackgroundContainer.vue";
 import AppHeaderContainer from "@/containers/AppHeaderContainer.vue";
 import AppGridContainer from "@/containers/AppGridContainer.vue";
 import AppScreenLabelListContainer from "@/containers/AppScreenLabelListContainer.vue";
 import AppContextMenuContainer from "@/containers/AppContextMenuContainer.vue";
-import { getAppService, getStorageService } from "@/composition/injectors";
+import {
+  getAppService,
+  getStorageService,
+  getStyleService,
+} from "@/composition/injectors";
 import AppSettingsContainer from "@/containers/AppSettingsContainer.vue";
 import AppSidebar from "@/components/AppSidebar.vue";
 import { useModal } from "@/composition/useModal";
-
-const isLoaded = ref(false);
 
 const storageService = getStorageService();
 const storageIsLoaded = computed(() => storageService.getIsLoaded());
@@ -22,6 +24,14 @@ const appService = getAppService();
 const isSidebarOpen = computed(() => appService.isSettingsOpen());
 const closeSidebar = () => appService.setSettingsOpen(false);
 
+const styleService = getStyleService();
+const onBackgroundTextColor = computed(() =>
+  styleService.getOnBackgroundTextColor()
+);
+const isBackgroundAvgColorCalculated = computed(() =>
+  styleService.isBackgroundAvgColorCalculated()
+);
+
 const { openModal: openWelcomeModal } = useModal("welcomeModal");
 
 watch(storageIsLoaded, () => {
@@ -29,30 +39,30 @@ watch(storageIsLoaded, () => {
     openWelcomeModal({}, {});
   }
 });
-
-onMounted(() => {
-  setTimeout(() => {
-    isLoaded.value = true;
-  }, 0);
-});
 </script>
 
 <template>
   <div class="app-root" v-if="storageIsLoaded">
-    <app-background-container
-      class="app-root__background"
-      :class="{ '_is-loaded': isLoaded }"
-    />
+    <app-background-container class="app-root__background" />
     <app-modals-container />
     <app-context-menu-container />
 
-    <div class="app-root__content content">
+    <div
+      class="app-root__content content"
+      :class="{
+        _hidden: !isBackgroundAvgColorCalculated,
+      }"
+    >
       <app-header-container class="content__header">
         <app-screen-label-list-container />
       </app-header-container>
       <app-grid-container class="content__grid" />
     </div>
-    <app-sidebar :is-open="isSidebarOpen" @close="closeSidebar">
+    <app-sidebar
+      :is-open="isSidebarOpen"
+      :close-button-color="onBackgroundTextColor"
+      @close="closeSidebar"
+    >
       <app-settings-container @save="closeSidebar" />
     </app-sidebar>
   </div>
@@ -86,10 +96,6 @@ html {
     left: 0;
     transition: opacity 0.5s;
     background-color: #b5b8be;
-
-    &:not(._is-loaded) {
-      opacity: 0;
-    }
   }
 
   &__content {
@@ -102,6 +108,7 @@ html {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  transition: opacity 0.5s;
 
   &__header {
     flex-shrink: 0;
@@ -112,6 +119,10 @@ html {
     flex-shrink: 1;
     flex-grow: 1;
     min-height: 0;
+  }
+
+  &._hidden {
+    opacity: 0;
   }
 }
 </style>

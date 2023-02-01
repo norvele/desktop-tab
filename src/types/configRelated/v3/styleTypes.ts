@@ -60,10 +60,31 @@ export type BackgroundParams = BackgroundUrlPart | BackgroundRandomGradientPart;
 
 // Overlay
 
+export const blendModes = [
+  "normal",
+  "multiply",
+  "screen",
+  "overlay",
+  "darken",
+  "lighten",
+  "color-dodge",
+  "color-burn",
+  "hard-light",
+  "soft-light",
+  "difference",
+  "exclusion",
+  "hue",
+  "saturation",
+  "color",
+  "luminosity",
+] as const;
+export type BlendModeUnit = typeof blendModes[number];
+
 export interface OverlayParams {
   blur: number;
   color: string;
   opacity: number;
+  blendMode: BlendModeUnit;
 }
 
 // Tile
@@ -76,6 +97,7 @@ export enum TileStyle {
   square = "square",
   circle = "circle",
   ios = "ios",
+  onlyIcon = "only-icon",
 }
 export type TileStyleUnion = `${TileStyle}`;
 

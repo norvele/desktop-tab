@@ -18,6 +18,7 @@ import UiLink from "@/components/UiLink.vue";
 import { getFaviconService } from "@/composition/injectors";
 import { isEmoji } from "@/utils/isEmoji";
 import type { TileStyleUnion } from "@/types/configRelated/v3/styleTypes";
+import { useTheme } from "@/composition/useTheme";
 
 const UiFormTextInput = adaptForField(UiTextInput);
 const faviconService = getFaviconService();
@@ -42,6 +43,8 @@ const emit = defineEmits<{
   (event: "close"): void;
   (event: "save", payload: SavePayload, coordinates?: Coordinates): void;
 }>();
+
+const { colors } = useTheme();
 
 const form = createFormStore("appTileModalForm", {
   label: {
@@ -198,7 +201,7 @@ const save = () => {
   &__icon {
     width: 50px;
     height: 50px;
-    border: 1px solid #dfe1e2;
+    border: 1px solid v-bind("colors.onBaseBackBorder");
   }
 
   &__links {

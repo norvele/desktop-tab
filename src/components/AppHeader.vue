@@ -10,6 +10,7 @@ import { computed } from "vue";
 const props = defineProps<{
   hasFreePlaces: boolean;
   tabItems: DropdownMenuItem[];
+  textColor: "light" | "dark";
 }>();
 
 const emit = defineEmits<{
@@ -58,7 +59,7 @@ const handleItemClick = (item: DropdownMenuItem, closeDropdown: () => void) => {
     <div class="app-header__start">
       <ui-dropdown>
         <template #trigger>
-          <ui-icon-button is-muted>
+          <ui-icon-button is-muted :color="textColor">
             <icon-plus />
           </ui-icon-button>
         </template>
@@ -74,7 +75,11 @@ const handleItemClick = (item: DropdownMenuItem, closeDropdown: () => void) => {
       <slot />
     </div>
     <div class="app-header__end">
-      <ui-icon-button is-muted @click="$emit('click-settings')">
+      <ui-icon-button
+        is-muted
+        :color="textColor"
+        @click="$emit('click-settings')"
+      >
         <icon-tune />
       </ui-icon-button>
     </div>

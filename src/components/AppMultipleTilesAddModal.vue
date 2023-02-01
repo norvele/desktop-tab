@@ -5,6 +5,7 @@ import UiModalFooter from "@/components/UiModalFooter.vue";
 import type { BrowserTab, TileSource } from "@/types";
 import { computed, ref } from "vue";
 import AppSelectableList from "@/components/AppSelectableList.vue";
+import { useTheme } from "@/composition/useTheme";
 
 const props = defineProps<{
   openedTabs: TileSource[];
@@ -19,6 +20,8 @@ const props = defineProps<{
 defineEmits<{
   (event: "close"): void;
 }>();
+
+const { colors } = useTheme();
 
 const isLoading = ref(false);
 
@@ -143,7 +146,7 @@ const submit = async () => {
   &__column {
     width: 50%;
     padding: 0 16px;
-    border-right: 1px solid #eaeaea;
+    border-right: 1px solid v-bind("colors.onBaseBackBorder");
     box-sizing: border-box;
 
     &:first-child {
@@ -177,6 +180,8 @@ const submit = async () => {
 }
 
 .counter {
+  color: v-bind("colors.onBaseBack");
+
   &._is-over-limit {
     color: #f44336;
   }

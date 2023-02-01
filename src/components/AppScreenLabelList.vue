@@ -8,6 +8,7 @@ defineProps<{
   currentScreenId: string;
   screenIds: string[];
   screens: Record<string, TileScreen>;
+  textColor: "light" | "dark";
 }>();
 
 const emit = defineEmits<{
@@ -43,6 +44,7 @@ const onDragSelect = (screenId: string) => {
           :label="screens[screenId].label"
           :is-non-interactive="isMove"
           :is-active="currentScreenId === screenId"
+          :text-color="textColor"
           @click="$emit('select', screenId)"
           @drag-select="onDragSelect(screenId)"
           @contextmenu.prevent="$emit('context-menu', $event, screenId)"

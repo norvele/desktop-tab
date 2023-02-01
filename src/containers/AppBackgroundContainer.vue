@@ -6,11 +6,14 @@ import { getStyleService } from "@/composition/injectors";
 const styleService = getStyleService();
 
 const style = computed(() => styleService.getStyle());
+const setBackgroundAvgColor = (value: string) =>
+  styleService.setBackgroundAvgColor(value);
 </script>
 
 <template>
   <app-background
     :background="style.background"
     :overlay="style.overlay"
-  ></app-background>
+    @avg-color-change="setBackgroundAvgColor"
+  />
 </template>

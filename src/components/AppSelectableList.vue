@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import UiCheckbox from "@/components/UiCheckbox.vue";
 import { computed, ref, watch } from "vue";
+import { useTheme } from "@/composition/useTheme";
 
 type Item = { id: string } & any;
 type SelectedItems = { [id: string]: true };
@@ -13,6 +14,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: "select", items: Item[]): void;
 }>();
+
+const { colors } = useTheme();
 
 const selectedIds = ref<SelectedItems>({});
 
@@ -129,9 +132,9 @@ const toggleAll = () => {
   }
 
   &._header {
-    border-bottom: 2px solid #eaeaea;
+    border-bottom: 2px solid v-bind("colors.onBaseBackBorder");
     padding-bottom: 4px;
-    color: #5f6368;
+    color: v-bind("colors.onBaseBack");
   }
 
   &._is-selected {
@@ -144,7 +147,7 @@ const toggleAll = () => {
       left: -$offsetH;
       right: -$offsetH;
       bottom: -$offsetV;
-      background-color: #f1f3f4;
+      background-color: v-bind("colors.baseButtonBack");
       border-radius: 4px;
     }
   }

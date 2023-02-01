@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { UiTab } from "@/types";
 import { computed } from "vue";
+import { useTheme } from "@/composition/useTheme";
 
 const props = defineProps<{
   tabs: UiTab[];
@@ -10,6 +11,8 @@ const props = defineProps<{
 defineEmits<{
   (event: "tab-click", tab: UiTab): void;
 }>();
+
+const { colors } = useTheme();
 
 const activeTab = computed(() => {
   return props.tabs.find((tab) => tab.id === props.activeTabId);
@@ -42,14 +45,14 @@ const activeTab = computed(() => {
   gap: 16px;
 
   &__tab {
-    color: #959595;
+    color: v-bind("colors.onBaseBack");
     font-weight: 600;
     padding: 6px 0;
     text-decoration: none;
     cursor: pointer;
 
     &._is-active {
-      color: #000;
+      color: v-bind("colors.onBaseBackContrast");
     }
   }
 }

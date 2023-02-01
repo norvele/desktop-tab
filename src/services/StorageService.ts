@@ -359,12 +359,13 @@ export class StorageService {
           color: "#000000",
           opacity: 0,
           blur: 0,
+          blendMode: "normal",
         },
-        onBackgroundTextColor: "light",
+        onBackgroundTextColor: "auto",
         tile: {
           style: "ios",
         },
-        theme: "light",
+        theme: "sync",
       },
     };
   }

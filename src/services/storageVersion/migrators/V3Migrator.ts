@@ -25,12 +25,13 @@ export class V3Migrator implements IMigrator<"v2", "v3"> {
             ? data.style.backgroundOverlay * 2 - 1
             : 1 - data.style.backgroundOverlay * 2,
           blur: data.style.backgroundBlur,
+          blendMode: "normal",
         },
-        onBackgroundTextColor: "light",
+        onBackgroundTextColor: "auto",
         tile: {
           style: data.style.tileStyle,
         },
-        theme: "light",
+        theme: "sync",
       },
     };
   }

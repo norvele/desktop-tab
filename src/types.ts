@@ -112,6 +112,7 @@ export interface BrowserService {
   subscribeToOpenedTabs(callback: (tabs: BrowserTab[]) => void): string;
   unsubscribeFromOpenedTabs(id: string): void;
   getTopSites(): Promise<BrowserTopSite[]>;
+  getTheme(): "light" | "dark";
 }
 
 export type LastReadonlyArrayElement<T extends readonly any[]> =

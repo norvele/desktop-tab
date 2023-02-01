@@ -10,6 +10,7 @@ import { ServiceType } from "@/serviceTypes";
 import type { BrowserService } from "@/types";
 import type { FaviconService } from "@/services/FaviconService";
 import type { FormBuilderService } from "@/services/form/FormBuilderService";
+import type { ThemeService } from "@/services/ThemeService";
 
 export function getStorageService() {
   return injectContainer().get<StorageService>(ServiceType.StorageService);
@@ -53,4 +54,8 @@ export function getFormBuilderService() {
   return injectContainer().get<FormBuilderService>(
     ServiceType.FormBuilderService
   );
+}
+
+export function getThemeService() {
+  return injectContainer().get<ThemeService>(ServiceType.ThemeService);
 }

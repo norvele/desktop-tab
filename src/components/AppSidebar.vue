@@ -3,14 +3,18 @@ import IconCross from "@/components/icons/IconCross.vue";
 import UiIconButton from "@/components/UiIconButton.vue";
 import type { Ref } from "vue";
 import { ref, watch } from "vue";
+import { useTheme } from "@/composition/useTheme";
 
 const props = defineProps<{
   isOpen: boolean;
+  closeButtonColor: "light" | "dark";
 }>();
 
 const emit = defineEmits<{
   (event: "close"): void;
 }>();
+
+const { colors } = useTheme();
 
 const close = () => {
   emit("close");
@@ -53,7 +57,11 @@ watch(
       <div class="container__inner">
         <template v-if="isOpen"><slot /></template>
       </div>
-      <ui-icon-button class="container__close" @click="close">
+      <ui-icon-button
+        class="container__close"
+        :color="closeButtonColor"
+        @click="close"
+      >
         <icon-cross />
       </ui-icon-button>
     </div>
@@ -103,7 +111,7 @@ watch(
 }
 
 .container {
-  background-color: #fff;
+  background-color: v-bind("colors.baseBack");
 
   &__inner {
     position: relative;

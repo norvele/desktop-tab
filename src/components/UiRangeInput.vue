@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { getControlEmits, useControl } from "@/composition/useControl";
+import { useTheme } from "@/composition/useTheme";
 
 type Value = number;
 
@@ -12,6 +13,8 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(getControlEmits<Value>());
+
+const { colors } = useTheme();
 
 const getValueFromEvent = (event: Event) => {
   const nValue = Number((event.target as HTMLInputElement)?.value) || 0;
@@ -65,24 +68,24 @@ const normalizedValue = computed(() => {
       cursor: pointer;
       animate: 0.2s;
       box-shadow: 0 0 0 #000000;
-      background: #f1f3f4;
+      background: v-bind("colors.inputBack");
       border-radius: 2px;
       border: 0 solid #000000;
     }
 
     &::-webkit-slider-thumb {
       box-shadow: 0 0 0 #000000;
-      border: 0 solid #3a8ef9;
+      border: 0 solid v-bind("colors.primaryBack");
       height: 14px;
       width: 14px;
       border-radius: 8px;
-      background: #3a8ef9;
+      background: v-bind("colors.primaryBack");
       cursor: pointer;
       -webkit-appearance: none;
       margin-top: -6px;
     }
     &:focus::-webkit-slider-runnable-track {
-      background: #f1f3f4;
+      background: v-bind("colors.inputBack");
     }
   }
 
@@ -94,7 +97,7 @@ const normalizedValue = computed(() => {
       top: 0;
       width: 2px;
       height: 100%;
-      background-color: #f1f3f4;
+      background-color: v-bind("colors.inputBack");
       transform: translateX(-50%);
     }
   }

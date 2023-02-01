@@ -4,6 +4,9 @@ import type { UiTab } from "@/types";
 import { ref } from "vue";
 import AppStyleSettingsContainer from "@/containers/settings/AppStyleSettingsContainer.vue";
 import AppGridSettingsContainer from "@/containers/settings/AppGridSettingsContainer.vue";
+import { useTheme } from "@/composition/useTheme";
+
+const { colors } = useTheme();
 
 enum Tab {
   style = "style",
@@ -60,7 +63,7 @@ const setActiveTabId = (tabId: string) => {
 
 .header {
   padding: 8px 16px;
-  border-bottom: 2px solid #eaeaea;
+  border-bottom: 2px solid v-bind("colors.onBaseBackBorder");
 }
 
 .content {

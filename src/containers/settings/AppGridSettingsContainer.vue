@@ -10,6 +10,9 @@ import UiFormGroup from "@/containers/form/UiFormGroup.vue";
 import UiFormField from "@/containers/form/UiFormField.vue";
 import UiFormNumberInput from "@/containers/form/controls/UiFormNumberInput.vue";
 import UiButton from "@/components/UiButton.vue";
+import { useTheme } from "@/composition/useTheme";
+
+const { colors } = useTheme();
 
 const gridService = getGridService();
 const gridHelperService = getGridHelperService();
@@ -110,7 +113,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .app-grid-settings-container {
   padding: 16px;
-  border-bottom: 1px solid #eaeaea;
+  border-bottom: 1px solid v-bind("colors.onBaseBackBorder");
 }
 
 .grid-params {

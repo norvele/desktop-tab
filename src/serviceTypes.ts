@@ -20,4 +20,5 @@ export const ServiceType = {
   AppService: Symbol("AppService"),
   BrowserService: Symbol("BrowserService"),
   FormBuilderService: Symbol("FormBuilderService"),
+  ThemeService: Symbol("ThemeService"),
 };

@@ -5,6 +5,7 @@ import {
   getAppService,
   getGridService,
   getScreenService,
+  getStyleService,
 } from "@/composition/injectors";
 import { openScreenModal } from "@/composition/screen";
 import { computed } from "vue";
@@ -13,6 +14,7 @@ import { getDropdownItemsFromOpenedTabs } from "@/composition/useOpenedTabs";
 const screenService = getScreenService();
 const gridService = getGridService();
 const appService = getAppService();
+const styleService = getStyleService();
 
 const tabItems = computed(() => {
   return getDropdownItemsFromOpenedTabs(screenService.getCurrentScreenId());
@@ -23,6 +25,10 @@ const hasFreePlaces = computed(() => {
     screenService.getCurrentScreenId()
   );
 });
+
+const onBackgroundTextColor = computed(() =>
+  styleService.getOnBackgroundTextColor()
+);
 
 const onAddTile = () => {
   openTileModal(screenService.getCurrentScreenId());
@@ -41,6 +47,7 @@ const openSettings = () => {
   <app-header
     :has-free-places="hasFreePlaces"
     :tab-items="tabItems"
+    :text-color="onBackgroundTextColor"
     @click-add-tile="onAddTile"
     @click-add-tile-multiple="onAddTileMultiple"
     @click-add-screen="openScreenModal"

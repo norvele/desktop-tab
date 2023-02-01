@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useTheme } from "@/composition/useTheme";
+
 withDefaults(
   defineProps<{
     tag?: string;
@@ -9,6 +11,8 @@ withDefaults(
     tag: "label",
   }
 );
+
+const { colors } = useTheme();
 </script>
 
 <template>
@@ -28,7 +32,7 @@ withDefaults(
   &__label {
     font-size: 12px;
     margin-bottom: 8px;
-    color: #5f6368;
+    color: v-bind("colors.onBaseBack");
     font-weight: 600;
   }
 
@@ -40,7 +44,7 @@ withDefaults(
 
   &:focus-within {
     .ui-field__label {
-      color: #3a8ef9;
+      color: v-bind("colors.primaryBack");
     }
   }
 }

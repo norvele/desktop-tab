@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useTheme } from "@/composition/useTheme";
+
 defineProps<{
   modelValue: string;
   label?: string;
@@ -12,6 +14,8 @@ const emit = defineEmits({
 const onInput = (event: Event) => {
   emit("update:model-value", (event.target as HTMLInputElement)?.value || "");
 };
+
+const { colors } = useTheme();
 </script>
 
 <template>
@@ -76,7 +80,7 @@ const onInput = (event: Event) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #dfe1e2;
+  border: 1px solid v-bind("colors.onBaseBackBorder");
   background-color: var(--color);
   line-height: 0;
 

@@ -1,14 +1,19 @@
 <script setup lang="ts">
-defineProps<{
-  isInverse?: boolean;
-  isMuted?: boolean;
-}>();
+withDefaults(
+  defineProps<{
+    color?: "light" | "dark";
+    isMuted?: boolean;
+  }>(),
+  {
+    color: "light",
+  }
+);
 </script>
 
 <template>
   <button
     class="ui-icon-button"
-    :class="{ '_is-inverse': isInverse, '_is-muted': isMuted }"
+    :class="[{ '_is-muted': isMuted }, `_color-${color}`]"
     type="button"
   >
     <slot />
@@ -38,7 +43,7 @@ defineProps<{
     background-color: rgba(#202124, 0.1);
   }
 
-  &._is-inverse {
+  &._color-dark {
     color: #000;
   }
 

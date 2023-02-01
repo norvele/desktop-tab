@@ -2,6 +2,7 @@
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import UiIconButton from "@/components/UiIconButton.vue";
 import IconCross from "@/components/icons/IconCross.vue";
+import { useTheme } from "@/composition/useTheme";
 
 defineProps<{
   title: string;
@@ -10,6 +11,8 @@ defineProps<{
 const emit = defineEmits({
   close: () => true,
 });
+
+const { colors, isDark } = useTheme();
 
 const backdrop = ref<HTMLElement>();
 
@@ -43,7 +46,11 @@ onBeforeUnmount(() => {
   <div class="ui-modal">
     <div class="ui-modal__backdrop" ref="backdrop"></div>
     <div class="ui-modal__container container">
-      <ui-icon-button class="container__close" @click="close" is-inverse>
+      <ui-icon-button
+        class="container__close"
+        @click="close"
+        :color="isDark ? 'light' : 'dark'"
+      >
         <icon-cross />
       </ui-icon-button>
       <div class="container__title" v-if="title">{{ title }}</div>
@@ -88,7 +95,7 @@ onBeforeUnmount(() => {
 .container {
   position: relative;
   padding: 24px;
-  background-color: #fff;
+  background-color: v-bind("colors.baseBack");
   border-radius: 8px;
   box-shadow: 0 0 16px rgb(0 0 0 / 12%), 0 16px 16px rgb(0 0 0 / 24%);
 
@@ -103,6 +110,7 @@ onBeforeUnmount(() => {
     margin-bottom: 16px;
     padding-right: 32px;
     margin-top: -8px;
+    color: v-bind("colors.onBaseBackContrast");
   }
 
   &__footer {

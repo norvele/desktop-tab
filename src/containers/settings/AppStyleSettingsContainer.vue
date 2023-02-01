@@ -10,6 +10,7 @@ import UiFormTextInput from "@/containers/form/controls/UiFormTextInput.vue";
 import { createUrlValidator } from "@/utils/validation";
 import { FormControlType } from "@/services/form/types";
 import {
+  blendModes,
   OnBackgroundTextColor,
   Theme,
   TileStyle,
@@ -24,10 +25,14 @@ import UiFormNumberInput from "@/containers/form/controls/UiFormNumberInput.vue"
 import UiButton from "@/components/UiButton.vue";
 import type { FormGroup } from "@/services/form/FormGroup";
 import { getRandomString } from "@/utils/getRandomString";
+import capitalize from "lodash/capitalize";
+import type { FormControl } from "@/services/form/FormControl";
+import { useTheme } from "@/composition/useTheme";
 
 const styleService = getStyleService();
 const builder = getFormBuilderService();
 
+const { colors } = useTheme();
 const style = computed(() => styleService.getStyle());
 
 const form = builder.group({
@@ -100,11 +105,23 @@ const form = builder.group({
       min: 0,
       max: 1,
     }),
+    blendMode: builder.control({
+      type: FormControlType.Select,
+      value: "normal",
+      options: blendModes.map((blendMode) => ({
+        value: blendMode,
+        label: capitalize(blendMode),
+      })),
+    }),
   }),
   onBackgroundTextColor: builder.control({
     type: FormControlType.Select,
     value: OnBackgroundTextColor.light,
-    options: [{ value: OnBackgroundTextColor.light, label: "Light" }],
+    options: [
+      { value: OnBackgroundTextColor.light, label: "Light" },
+      { value: OnBackgroundTextColor.dark, label: "Dark" },
+      { value: OnBackgroundTextColor.auto, label: "Auto" },
+    ],
   }),
   tile: builder.group({
     style: builder.control({
@@ -114,14 +131,33 @@ const form = builder.group({
         { value: TileStyle.circle, label: "Circle" },
         { value: TileStyle.ios, label: "iOS" },
         { value: TileStyle.square, label: "Square" },
+        { value: TileStyle.onlyIcon, label: "Only icon" },
       ],
     }),
   }),
   theme: builder.control({
     type: FormControlType.Select,
     value: Theme.light,
-    options: [{ value: Theme.light, label: "Light" }],
+    options: [
+      { value: Theme.light, label: "Light" },
+      { value: Theme.dark, label: "Dark" },
+      { value: Theme.sync, label: "Sync with the browser" },
+    ],
   }),
+});
+
+const hasOnBackgroundTextColorAlert = computed(() => {
+  const onBackgroundTextColor = form
+    .getChild<FormControl>("onBackgroundTextColor")
+    .getValue();
+  const blendMode = form
+    .getChild<FormGroup>("overlay")
+    .getChild<FormControl>("blendMode")
+    .getValue();
+  return (
+    onBackgroundTextColor === OnBackgroundTextColor.auto &&
+    blendMode !== "normal"
+  );
 });
 
 const randomizeSeed = () => {
@@ -241,18 +277,28 @@ onMounted(() => {
           </div>
         </ui-field>
 
-        <ui-form-field form-control="blur" label="Blur">
+        <ui-form-field form-control="blur" label="Blur" class="margin-bottom">
           <ui-form-range-input form-control="blur" />
+        </ui-form-field>
+
+        <ui-form-field form-control="blendMode" label="Blend mode">
+          <ui-form-select form-control="blendMode" />
         </ui-form-field>
       </ui-form-group>
 
       <div class="form-section">
         <ui-form-field
           form-control="onBackgroundTextColor"
-          label="On background text color"
+          label="Elements color on background"
         >
           <ui-form-select form-control="onBackgroundTextColor" />
         </ui-form-field>
+        <div v-if="hasOnBackgroundTextColorAlert" class="margin-top">
+          <div class="alert">
+            "Auto" option is not working properly with overlay blend modes other
+            than "Normal".
+          </div>
+        </div>
       </div>
 
       <ui-form-group form-group="tile" class="form-section">
@@ -273,11 +319,15 @@ onMounted(() => {
 <style lang="scss" scoped>
 .form-section {
   padding: 16px;
-  border-bottom: 1px solid #eaeaea;
+  border-bottom: 1px solid v-bind("colors.onBaseBackBorder");
 }
 
 .margin-bottom {
   margin-bottom: 16px;
+}
+
+.margin-top {
+  margin-top: 16px;
 }
 
 .overlay-color {
@@ -322,5 +372,9 @@ onMounted(() => {
     flex-shrink: 0;
     flex-grow: 0;
   }
+}
+
+.alert {
+  color: #ff8a00;
 }
 </style>

@@ -16,9 +16,10 @@ import { EventEmitterService } from "@/services/EventEmitterService";
 import { AppStoreDefinition } from "@/stores/AppStore";
 import { AppService } from "@/services/AppService";
 import { ServiceType } from "@/serviceTypes";
-import { ChromeBrowserService } from "@/services/CromeBrowserService";
+import { ChromeBrowserService } from "@/services/ChromeBrowserService";
 import { BaseBrowserService } from "@/services/BaseBrowserService";
 import { FormBuilderService } from "@/services/form/FormBuilderService";
+import { ThemeService } from "@/services/ThemeService";
 
 export function createContainer(isProduction: boolean) {
   const BrowserServiceClass = isProduction
@@ -60,6 +61,7 @@ export function createContainer(isProduction: boolean) {
   container.bind(ServiceType.AppService).to(AppService);
   container.bind(ServiceType.BrowserService).to(BrowserServiceClass);
   container.bind(ServiceType.FormBuilderService).to(FormBuilderService);
+  container.bind(ServiceType.ThemeService).to(ThemeService);
 
   return container;
 }

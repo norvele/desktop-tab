@@ -14,11 +14,17 @@ interface GroupSelection {
   lastSelectedIds: SelectableId[];
 }
 
-const props = defineProps<{
-  selectedIds: SelectableId[];
-  selectableIdAttrName: string;
-  selectableClassName: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    selectedIds: SelectableId[];
+    selectableIdAttrName: string;
+    selectableClassName: string;
+    color?: "light" | "dark";
+  }>(),
+  {
+    color: "light",
+  }
+);
 
 const emit = defineEmits<{
   (event: "about-to-select", payload: SelectableId[]): void;
@@ -248,6 +254,7 @@ onBeforeUnmount(() => {
     <div
       v-if="leftTopPoint && rightBottomPoint"
       class="selection"
+      :class="`_color-${color}`"
       :style="{
         '--selection-x1': `${leftTopPoint?.x}px`,
         '--selection-y1': `${leftTopPoint?.y}px`,
@@ -262,7 +269,6 @@ onBeforeUnmount(() => {
 .selection {
   position: fixed;
   background-color: rgba(#fff, 0.2);
-  border-radius: 4px;
   border: 1px solid rgba(#fff, 0.4);
   pointer-events: none;
   z-index: 1000;
@@ -271,5 +277,10 @@ onBeforeUnmount(() => {
   left: var(--selection-x1);
   width: calc(var(--selection-x2) - var(--selection-x1));
   height: calc(var(--selection-y2) - var(--selection-y1));
+
+  &._color-dark {
+    background-color: rgba(#000, 0.2);
+    border-color: rgba(#000, 0.4);
+  }
 }
 </style>

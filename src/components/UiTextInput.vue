@@ -2,6 +2,7 @@
 import type { Ref } from "vue";
 import { onMounted, ref } from "vue";
 import { getControlEmits, useControl } from "@/composition/useControl";
+import { useTheme } from "@/composition/useTheme";
 
 type Value = string;
 
@@ -12,6 +13,8 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(getControlEmits<Value>());
+
+const { colors } = useTheme();
 
 const getValueFromEvent = (event: Event) =>
   (event.target as HTMLInputElement)?.value || "";
@@ -42,8 +45,8 @@ onMounted(() => {
 <style lang="scss" scoped>
 .ui-text-input {
   box-sizing: border-box;
-  background: #f1f3f4;
-  color: #000;
+  background: v-bind("colors.inputBack");
+  color: v-bind("colors.onInputBack");
   border: none;
   border-radius: 4px;
   font-size: 14px;
@@ -52,7 +55,7 @@ onMounted(() => {
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 2px #3a8ef9;
+    box-shadow: 0 0 0 2px v-bind("colors.primaryBack");
   }
 }
 </style>

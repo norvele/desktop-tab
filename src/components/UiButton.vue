@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useTheme } from "@/composition/useTheme";
+
 defineProps<{
   color?: "primary" | "secondary";
   type?: "button" | "submit";
@@ -9,6 +11,8 @@ defineProps<{
 const emit = defineEmits({
   click: () => true,
 });
+
+const { colors } = useTheme();
 
 const onClick = () => {
   emit("click");
@@ -32,27 +36,25 @@ const onClick = () => {
   border: none;
   background: none;
   border-radius: 4px;
-  background-color: #f1f3f4;
-  box-shadow: 0 0 2px rgba(#000, 0.12), 0 2px 2px rgba(#000, 0.24);
+  background-color: v-bind("colors.baseButtonBack");
+  color: v-bind("colors.onBaseButtonBack");
   padding: 8px 16px;
   cursor: pointer;
 
   &:hover {
-    background-color: #e8eaeb;
+    background-color: v-bind("colors.baseButtonBackHover");
   }
 
   &:focus {
     outline: none;
-    // box-shadow: 0 0 0 2px #1a73e8 !important;
   }
 
   &._color-primary {
-    background-color: #3a8ef9;
-    color: #fff;
-    box-shadow: 0 0 2px rgba(#1a73e8, 0.12), 0 2px 2px rgba(#1a73e8, 0.24);
+    background-color: v-bind("colors.primaryBack");
+    color: v-bind("colors.onPrimaryBack");
 
     &:hover {
-      background-color: #4d96f3;
+      background-color: v-bind("colors.primaryBackHover");
     }
   }
 

@@ -3,6 +3,7 @@ import type { StyleStoreDefinition } from "@/stores/StyleStore";
 import { inject, injectable } from "inversify";
 import { ServiceType } from "@/serviceTypes";
 import type { AppStyle } from "@/types/configRelated/v3/styleTypes";
+import { getContrast } from "color2k";
 
 @injectable()
 export class StyleService {
@@ -22,5 +23,25 @@ export class StyleService {
 
   public updateStyleWithoutSaving(style: Partial<AppStyle>) {
     this.storageService.updateStyleWithoutSaving(style);
+  }
+
+  public setBackgroundAvgColor(color: string) {
+    this.styleStoreDefinition().backgroundAvgColor = color;
+  }
+
+  public getOnBackgroundTextColor() {
+    const onBackgroundTextColorSetting = this.getStyle().onBackgroundTextColor;
+    if (onBackgroundTextColorSetting === "auto") {
+      const contrast = getContrast(
+        this.styleStoreDefinition().backgroundAvgColor || "#000000",
+        "#fff"
+      );
+      return contrast < 1.7 ? "dark" : "light";
+    }
+    return onBackgroundTextColorSetting;
+  }
+
+  public isBackgroundAvgColorCalculated() {
+    return !!this.styleStoreDefinition().backgroundAvgColor;
   }
 }
